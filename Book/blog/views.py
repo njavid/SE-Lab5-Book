@@ -27,3 +27,22 @@ def create(request):
         return HttpResponse("created successfully, book id = "+str(book.id),status= 201)
     else:
         return HttpResponse(status=401,content="method not allowed!")
+
+@csrf_exempt
+def update(request):
+    if request.method == 'POST':
+        received_json_data = json.loads(request.body)
+        if not "id" in received_json_data:
+            return HttpResponse("book id please.", status=400)
+        id = received_json_data["id"]
+        book = Book.objects.filter(id=id)[0]
+        if "title" in received_json_data:
+            book.title = received_json_data["title"]
+        if "category" in received_json_data:
+            book.category = int(received_json_data["category"])
+        book.save()
+        response_data = {"id":book.id,"title":book.title,"category":book.category}
+        return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
+
+    else:
+        return HttpResponse(status=401,content="method not allowed!")
