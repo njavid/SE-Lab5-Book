@@ -47,6 +47,23 @@ def update(request):
     else:
         return HttpResponse(status=401,content="method not allowed!")
 
+@csrf_exempt
+def delete(request):
+    if request.method != 'POST':
+        return HttpResponse(status=401, content="method not allowed!")
+    received_json_data = json.loads(request.body)
+    if not "id" in received_json_data:
+        return HttpResponse("book id please.", status=400)
+    book = Book.objects.filter(id=received_json_data["id"])
+    if len(book) == 0:
+        return HttpResponse(status=401, content="the book does not exists!")
+    book = book[0]
+    id = book.id
+    book.delete()
+    # print(123)
+    return HttpResponse("book "+ str(id)+ " delete successfully!", status=200)
+
+
 def read(request):
     if request.method != 'GET':
         return HttpResponse(status=401, content="method not allowed!")
