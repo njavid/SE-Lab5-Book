@@ -46,3 +46,20 @@ def update(request):
 
     else:
         return HttpResponse(status=401,content="method not allowed!")
+
+def read(request):
+    if request.method != 'GET':
+        return HttpResponse(status=401, content="method not allowed!")
+    print(id)
+    title = ""
+    received_json_data = json.loads(request.body)
+    books = Book.objects.all()
+    if "title" in received_json_data:
+        books = books.filter(title__icontains=received_json_data["title"])
+    if "category" in received_json_data:
+        books = books.filter(category = int(received_json_data["category"]))
+    response_data = {}
+    for book in books:
+        response_data[book.id]={"title":book.title,"category":book.category}
+    return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
+
